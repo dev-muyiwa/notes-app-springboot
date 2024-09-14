@@ -1,11 +1,8 @@
 package dev.muyiwa.demoapp.notes;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity(name = "notes")
@@ -13,14 +10,30 @@ public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+
     private String title;
+
     private String content;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
+
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private Instant created_at;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updated_at;
 
     public Note() {
-        this.created_at = LocalDateTime.now();
-        this.updated_at = LocalDateTime.now();
+        this.updated_at = Instant.now();  // UTC time
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.created_at = Instant.now();
+        this.updated_at = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updated_at = Instant.now();
     }
 
     public UUID getId() {
@@ -47,20 +60,12 @@ public class Note {
         this.content = content;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return created_at;
     }
 
-    public void setCreatedAt(LocalDateTime created_at) {
-        this.created_at = created_at;
-    }
-
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updated_at;
-    }
-
-    public void setUpdatedAt(LocalDateTime updated_at) {
-        this.updated_at = updated_at;
     }
 
     public NoteDto toDto() {

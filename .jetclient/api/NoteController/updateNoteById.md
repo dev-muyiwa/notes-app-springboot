@@ -8,15 +8,12 @@ id = 'ddba4d0d-6007-4d18-9f33-01145c0c1697'
 
 [[pathVariables]]
 key = 'id'
+value = 'f4c86c3a-3f69-48aa-8e53-1110ba17d101'
 
 [body]
 type = 'JSON'
 raw = '''
 {
-  "id": null,
-  "title": "",
-  "content": "",
-  "createdAt": "2024-09-14",
-  "updatedAt": "2024-09-14"
+  "title": "API 201",
 }'''
 ```

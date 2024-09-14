@@ -1,6 +1,10 @@
 package dev.muyiwa.demoapp.notes;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,19 +30,31 @@ public class NoteService {
         return noteRepository.findById(id);
     }
 
-    public Note updateNoteById() {
-        return null;
+    public Note updateNoteById(UUID id, NoteDto noteDto) {
+        Optional<Note> optionalNote = noteRepository.findById(id);
+        if (optionalNote.isEmpty()) {
+            throw new EntityNotFoundException("note not found with id: " + id);
+        }
+
+        Note note = optionalNote.get();
+
+        note.setTitle(noteDto.getTitle() != null && !noteDto.getTitle().isEmpty() ? noteDto.getTitle() : note.getTitle());
+        note.setContent(noteDto.getContent() != null && !noteDto.getContent().isEmpty() ? noteDto.getContent() : note.getContent());
+
+        return noteRepository.save(note);
     }
 
     public void deleteNoteById(UUID id) {
+        Optional<Note> optionalNote = noteRepository.findById(id);
+        if (optionalNote.isEmpty()) {
+            throw new EntityNotFoundException("note not found with id: " + id);
+        }
         noteRepository.deleteById(id);
     }
 
-    public List<NoteDto> getNotes() {
-        List<Note> notes = noteRepository.findAll();
-        return notes.stream()
-                .map(Note::toDto)
-                .collect(Collectors.toList());
+    public Page<NoteDto> getNotes(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return noteRepository.findAll(pageable).map(Note::toDto);
     }
 
 }
